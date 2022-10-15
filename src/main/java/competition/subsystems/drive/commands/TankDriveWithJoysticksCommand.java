@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import xbot.common.command.BaseCommand;
 import competition.operator_interface.OperatorInterface;
 import competition.subsystems.drive.DriveSubsystem;
+import xbot.common.controls.actuators.XCANTalon;
 
 //This first exercise is mostly completed for you. Take your time to read through it,
 // review all the comments, and then complete it by adding in a bit more code of your own.
@@ -13,6 +14,8 @@ public class TankDriveWithJoysticksCommand extends BaseCommand {
 
     DriveSubsystem drive;
     OperatorInterface operatorInterface;
+    public XCANTalon frontLeft;
+    public XCANTalon frontRight;
 
     @Inject
     public TankDriveWithJoysticksCommand(DriveSubsystem driveSubsystem, OperatorInterface oi) {
@@ -36,6 +39,7 @@ public class TankDriveWithJoysticksCommand extends BaseCommand {
         double leftValue = operatorInterface.gamepad.getLeftVector().y;
         double rightValue = operatorInterface.gamepad.getRightVector().y;
         // You'll need to get how far the RIGHT joystick's Y-axis is pushed as well.
+        
 
         // Pass values into the DriveSubsystem so it can control motors:
         // right now, this just sends the left power to the left part of the drive.
