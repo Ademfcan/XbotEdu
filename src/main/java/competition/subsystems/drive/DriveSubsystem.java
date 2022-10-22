@@ -74,8 +74,8 @@ public class DriveSubsystem extends BaseSubsystem {
 
     public void ArcadeDrive(double x, double y) {
 
-        frontLeft.simpleSet(y+x);
-        frontRight.simpleSet(y-x);
+        frontLeft.simpleSet(y-x);
+        frontRight.simpleSet(y+x);
         
 
     }
