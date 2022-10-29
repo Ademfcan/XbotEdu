@@ -7,6 +7,7 @@ import competition.subsystems.drive.DriveSubsystem;
 import competition.subsystems.pose.PoseSubsystem;
 import scala.util.control.Breaks;
 import xbot.common.controls.actuators.XCANTalon;
+import xbot.common.math.XYPair;
 
 public class DriveToPositionCommand extends BaseCommand {
 
@@ -16,6 +17,8 @@ public class DriveToPositionCommand extends BaseCommand {
     //public XCANTalon frontRight;
     private double goal;
     private boolean targetReached;
+    double oldPos;
+    double speed;
 
     @Inject
     public DriveToPositionCommand(DriveSubsystem driveSubsystem, PoseSubsystem pose) {
@@ -46,38 +49,40 @@ public class DriveToPositionCommand extends BaseCommand {
         // How you do this is up to you. If you get stuck, ask a mentor or student for
         // some hints!
         double position = pose.getPosition();
-        double accelerationThreshold = 2.1;
         
-        if(position >= 0 && position <= accelerationThreshold && targetReached == false){
-            drive.frontLeft.simpleSet(1);
-            drive.frontRight.simpleSet(1);
-        }
-        else if(position > goal-2 && position< goal && targetReached == false){
-            drive.frontLeft.simpleSet(-1);
-            drive.frontRight.simpleSet(-1);
-        }
-        else if(position >= goal || targetReached == true){
+        
+        double distanceAway = goal - position;
+        speed = position - oldPos;
 
-            
+        double x = ((distanceAway) * .5- (speed *3));
+        drive.frontLeft.simpleSet(x);
+        drive.frontRight.simpleSet(x);
+        
+        if(distanceAway < 0.1){
             targetReached = true;
-            drive.frontLeft.simpleSet(0);
-            drive.frontRight.simpleSet(0);
-
         }
-        else{
-            drive.frontLeft.simpleSet(0);
-            drive.frontRight.simpleSet(0);
-        }
+        
+         
 
 
         
+       
+        
+
+
+        oldPos = position;
     }
 
     @Override
     public boolean isFinished() {
         // Modify this to return true once you have met your goal,
         // and you're moving fairly slowly (ideally stopped)
-        return false;
+        if(targetReached == true){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 }
