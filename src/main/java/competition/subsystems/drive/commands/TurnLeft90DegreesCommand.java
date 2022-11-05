@@ -1,10 +1,12 @@
 package competition.subsystems.drive.commands;
 
 import com.google.inject.Inject;
+import com.google.inject.spi.DisableCircularProxiesOption;
 
 import xbot.common.command.BaseCommand;
 import competition.subsystems.drive.DriveSubsystem;
 import competition.subsystems.pose.PoseSubsystem;
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 
 public class TurnLeft90DegreesCommand extends BaseCommand {
 
@@ -12,6 +14,10 @@ public class TurnLeft90DegreesCommand extends BaseCommand {
     PoseSubsystem pose;
     double oldPos;
     double DegreesAway;
+    double goal;
+    double StartRot;
+    double rotation;
+    boolean done = false;
 
     @Inject
     public TurnLeft90DegreesCommand(DriveSubsystem driveSubsystem, PoseSubsystem pose) {
@@ -21,14 +27,31 @@ public class TurnLeft90DegreesCommand extends BaseCommand {
 
     @Override
     public void initialize() {
-
+        StartRot= pose.getCurrentHeading().getDegrees();
+        rotation = pose.getCurrentHeading().getDegrees();
+        goal  = StartRot + 90;
+        
     }
 
     @Override
     public void execute() {
         
-        double rotation = pose.getCurrentHeading().getDegrees();
-        DegreesAway = rotation - 90;
+        rotation = pose.getCurrentHeading().getDegrees();
+
+        DegreesAway = goal - rotation;
+        if(goal > 180){
+            goal -= 360;
+            DegreesAway += 360;
+            
+        }
+        if(DegreesAway > 180){
+            DegreesAway -=360;
+        }
+        if(DegreesAway <-180){
+            DegreesAway += 360;
+        }
+
+
         double speed = rotation - oldPos;
 
         double x = DegreesAway * 0.1 - speed * 2.5;
@@ -37,6 +60,9 @@ public class TurnLeft90DegreesCommand extends BaseCommand {
 
 
         oldPos = rotation;
+        if(DegreesAway < 0.1){
+            done = true;
+        }
         
 
         
@@ -46,9 +72,8 @@ public class TurnLeft90DegreesCommand extends BaseCommand {
     }
     @Override
     public boolean isFinished() {
-        if(DegreesAway < 0.1){
-            drive.frontLeft.simpleSet(0);
-            drive.frontRight.simpleSet(0);
+        if(done == true){
+
             return true;
         }
         return false;
